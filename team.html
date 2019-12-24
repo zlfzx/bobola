@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<title>Detail Team |BoBOLA</title>
+	<link rel="stylesheet" href="assets/css/materialize.min.css">
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+	<!-- Navigasi -->
+	<nav class="deep-purple darken-3" role="navigation">
+		<div class="nav-wrapper container">
+			<a href="#" class="brand-logo right" id="logo-container">BoBOLA</a>
+			<a onclick="back()" class="sidenav-trigger" data-target="nav-mobile" style="cursor: pointer;"><i class="material-icons">arrow_back</i></a>
+
+			<a onclick="back()" class="hide-on-med-and-down" style="cursor: pointer;"><i class="material-icons">arrow_back</i></a>
+		</div>
+	</nav>
+
+	<div class="container" id="body-content">	
+		
+		<div class="card">
+			<div class="card-content">
+				<div class="center-align">
+					<!-- Loading -->
+					<div class="preloader-wrapper big active" id="loading">
+						<div class="spinner-layer spinner-red-only">
+							<div class="circle-clipper left">
+								<div class="circle"></div>
+							</div>
+							<div class="gap-patch">
+								<div class="circle"></div>
+							</div>
+							<div class="circle-clipper right">
+								<div class="circle"></div>
+							</div>
+						</div>
+					</div>
+					<!-- /Loading -->
+					<img src="" alt="" id="logo_klub" style="width: 100px;">
+					<h4 class="card-title" id="namaKlub"></h4>
+				</div>
+				<ul class="tabs tabs-fixed-width z-depth-1">
+					<li class="tab"><a class="active" href="#detail">Detail</a></li>
+					<li class="tab"><a href="#pemain">Pemain</a></li>
+				</ul>
+				<div id="detail" class="col s12">
+					<table class="highlight" id="tabelDetailKlub">
+					</table>
+				</div>
+				<div id="pemain" class="col s12">
+					<table class="striped highlight">
+						<thead>
+							<tr>
+								<th class="center-align">Pemain</th>
+								<th class="center-align">Posisi</th>
+							</tr>
+						</thead>
+						<tbody id="tabelPemainKlub">
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		<div class="fixed-action-btn">
+			<a id="fav_team" class="btn-floating btn-large red">
+				<i class="large material-icons" id="icon_fav"></i>
+			</a>
+		</div>
+	
+	</div>
+
+	<script src="assets/js/materialize.min.js"></script>
+	<script src="assets/js/script.js"></script>
+	<script src="assets/js/api.js"></script>
+	<script src="assets/js/idb.js"></script>
+	<script src="assets/js/database.js"></script>
+	<script>
+		if ('serviceWorker' in navigator) {
+			window.addEventListener('load', function(){
+				navigator.serviceWorker.register('/sw.js')
+					.then(function(){
+						console.log('Pendaftaran Service Worker Berhasil')
+					})
+					.catch(function(){
+						console.log('Pendaftaran service Worker Gagal')
+					})
+
+				if ('Notification' in window) {
+					Notification.requestPermission().then(function(result){
+						if (result === 'denied') {
+							console.log("Notifikasi tidak diijinkan");
+						} else if (result === 'default') {
+							console.log("Pengguna menutup kotak dialog ijin notifikasi");
+						}
+
+						navigator.serviceWorker.getRegistration()
+					})
+				}
+			})
+		} else {
+			console.log('Browser tidak mndukung service worker')
+		}
+
+		document.addEventListener('DOMContentLoaded', function(){
+			var tabs = document.querySelectorAll('.tabs')
+			M.Tabs.init(tabs, {
+				'swipeable': false
+			});
+
+			getKlub();
+			var idParam = Number(getParam('id')),
+				icon_fav = getId('icon_fav');
+			icon_fav.onclick = function(){
+				cekDataFav('tim_favorit', idParam).then(function(status){
+					if (status) {
+						delFav('tim_favorit', idParam);
+					} else {
+						getKlub().then(function(data){
+							addFav('tim_favorit', data);
+						});
+					}
+				})
+			}
+			
+		})
+	</script>
+</body>
+</html>

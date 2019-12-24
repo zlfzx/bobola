@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<title>Detail Pertandingan | BoBOLA</title>
+	<link rel="stylesheet" href="assets/css/materialize.min.css">
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+	<!-- Navigasi -->
+	<nav class="deep-purple darken-3" role="navigation">
+		<div class="nav-wrapper container">
+			<a href="#" class="brand-logo right" id="logo-container">BoBOLA</a>
+			<a onclick="back()" class="sidenav-trigger" data-target="nav-mobile" style="cursor: pointer;"><i class="material-icons">arrow_back</i></a>
+
+			<a onclick="back()" class="hide-on-med-and-down" style="cursor: pointer;"><i class="material-icons">arrow_back</i></a>
+		</div>
+	</nav>
+
+	<div class="container" id="body-content">
+		
+		<div class="card">
+			<div class="card-content">
+				<div class="center-align">
+					<h6 class="deep-purple-text">Pertandingan ke-<span id="matchday"></span></h6>
+					<h6 class="flow-text"><i class="material-icons">access_time</i> <span id="tanggal"></span></h6>
+					<div class="row">
+						<div class="col s5"><h5 id="homeTeam"></h5></div>
+						<div class="col s2"><h6>VS</h6></div>
+						<div class="col s5"><h5 id="awayTeam"></h5></div>
+					</div>
+					<h5><i class="material-icons">location_on</i> <span id="venue"></span></h5>
+					<hr>
+					<h5 class="red-text">Head To Head</h5>
+					<h6>Jumlah Pertandingan : <span id="jumlahMatch">0</span></h6>
+					<h6>Total Goal : <span id="jumlahGoal">0</span></h6>
+					<div class="row">
+						<div class="col s5"><h5 id="homeMenang">0</h5></div>
+						<div class="col s2"><h6>Menang</h6></div>
+						<div class="col s5"><h5 id="awayMenang">0</h5></div>
+
+						<div class="col s5"><h5 id="homeKalah">0</h5></div>
+						<div class="col s2"><h6>Kalah</h6></div>
+						<div class="col s5"><h5 id="awayKalah">0</h5></div>
+
+						<div class="col s5"><h5 id="homeSeri">0</h5></div>
+						<div class="col s2"><h6>Seri</h6></div>
+						<div class="col s5"><h5 id="awaySeri">0</h5></div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="fixed-action-btn">
+			<a class="btn-floating btn-large red">
+				<i class="large material-icons" id="icon_fav"></i>
+			</a>
+		</div>
+
+	</div>
+	
+	<script src="assets/js/materialize.min.js"></script>
+	<script src="assets/js/script.js"></script>
+	<script src="assets/js/api.js"></script>
+	<script src="assets/js/idb.js"></script>
+	<script src="assets/js/database.js"></script>
+	<script>
+		if ('serviceWorker' in navigator) {
+			window.addEventListener('load', function(){
+				navigator.serviceWorker.register('sw.js')
+					.then(function(){
+						console.log('Pendaftaran Service Worker Berhsil');
+					})
+					.catch(function(){
+						console.log('Pendaftaran Service Worker gagal');
+					})
+
+				if ('Notification' in window) {
+					Notification.requestPermission().then(function(result){
+						if (result === 'denied') {
+							console.log("Notifikasi tidak diijinkan");
+						} else if (result === 'default') {
+							console.log("Pengguna menutup kotak dialog ijin notifikasi");
+						}
+
+						navigator.serviceWorker.getRegistration();
+					})
+				}
+			})
+		} else {
+			console.log('Browser tidak mendukung service worker');
+		}
+
+		document.addEventListener('DOMContentLoaded', function(){
+			getDetailPertandingan();
+			var idParam = Number(getParam('id')),
+				icon_fav = getId('icon_fav');
+
+			icon_fav.onclick = () => {
+				cekDataFav('match_favorit', idParam).then((status) => {
+					if (status) {
+						delFav('match_favorit', idParam);
+					} else {
+						getDetailPertandingan().then((data) => {
+							data.id = idParam;
+							addFav('match_favorit', data);
+						})
+					}
+				})
+			}
+		})
+	</script>
+</body>
+</html>
